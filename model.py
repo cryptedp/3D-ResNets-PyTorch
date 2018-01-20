@@ -5,7 +5,7 @@ from models import resnet, pre_act_resnet, wide_resnet, resnext, densenet
 
 
 def generate_model(opt):
-    assert opt.model in ['resnet', 'preresnet', 'wideresnet', 'resnext', 'densenet']
+    assert opt.model in ['resnet', 'preresnet', 'wideresnet', 'resnext', 'densenet','standard']
 
     if opt.model == 'resnet':
         assert opt.model_depth in [10, 18, 34, 50, 101, 152, 200]
@@ -95,7 +95,9 @@ def generate_model(opt):
         elif opt.model_depth == 264:
             model = densenet.densenet264(num_classes=opt.n_classes,
                                          sample_size=opt.sample_size, sample_duration=opt.sample_duration)
-
+    elif opt.model == 'standard'
+	num_classes=opt.n_classes
+	print("test")	
     if not opt.no_cuda:
         model = model.cuda()
         model = nn.DataParallel(model, device_ids=None)
