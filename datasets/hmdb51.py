@@ -6,7 +6,7 @@ import math
 import functools
 import json
 import copy
-
+import numpy as np
 from utils import load_value_file
 
 
@@ -79,7 +79,7 @@ def get_video_names_and_annotations(data, subset):
     return video_names, annotations
 
 
-def make_dataset(root_path, annotation_path, subset,
+def make_dataset(root_path, annotation_path, random, subset,
                  n_samples_for_each_video, sample_duration):
     data = load_annotation_data(annotation_path)
     video_names, annotations = get_video_names_and_annotations(data, subset)
@@ -111,7 +111,10 @@ def make_dataset(root_path, annotation_path, subset,
             'video_id': video_names[i].split('/')[1]
         }
         if len(annotations) != 0:
-            sample['label'] = class_to_idx[annotations[i]['label']]
+            if random:
+                sample['label'] = np.random.choice(51)
+            else:
+                sample['label'] = class_to_idx[annotations[i]['label']]
         else:
             sample['label'] = -1
 
@@ -149,10 +152,10 @@ class HMDB51(data.Dataset):
         imgs (list): List of (image path, class_index) tuples
     """
 
-    def __init__(self, root_path, annotation_path, subset, n_samples_for_each_video=1,
+    def __init__(self, root_path, annotation_path, random, subset, n_samples_for_each_video=1,
                  spatial_transform=None, temporal_transform=None, target_transform=None,
                  sample_duration=16, get_loader=get_default_video_loader):
-        self.data, self.class_names = make_dataset(root_path, annotation_path, subset,
+        self.data, self.class_names = make_dataset(root_path, annotation_path, random, subset,
                                                    n_samples_for_each_video, sample_duration)
 
         self.spatial_transform = spatial_transform

@@ -18,12 +18,12 @@ def get_training_set(opt, spatial_transform, temporal_transform, target_transfor
                                     temporal_transform=temporal_transform,
                                     target_transform=target_transform)
     elif opt.dataset == 'ucf101':
-        training_data = UCF101(opt.video_path, opt.annotation_path, 'training',
+        training_data = UCF101(opt.video_path, opt.annotation_path, opt.random, 'training',
                                spatial_transform=spatial_transform,
                                temporal_transform=temporal_transform,
                                target_transform=target_transform)
     elif opt.dataset == 'hmdb51':
-        training_data = HMDB51(opt.video_path, opt.annotation_path, 'training',
+        training_data = HMDB51(opt.video_path, opt.annotation_path, opt.random 'training',
                                spatial_transform=spatial_transform,
                                temporal_transform=temporal_transform,
                                target_transform=target_transform)
@@ -43,11 +43,11 @@ def get_validation_set(opt, spatial_transform, temporal_transform, target_transf
                                       spatial_transform, temporal_transform, target_transform,
                                       sample_duration=opt.sample_duration)
     elif opt.dataset == 'ucf101':
-        validation_data = UCF101(opt.video_path, opt.annotation_path, 'validation', opt.n_val_samples,
+        validation_data = UCF101(opt.video_path, opt.annotation_path, opt.random, 'validation', opt.n_val_samples,
                                  spatial_transform, temporal_transform, target_transform,
                                  sample_duration=opt.sample_duration)
     elif opt.dataset == 'hmdb51':
-       validation_data = HMDB51(opt.video_path, opt.annotation_path, 'validation', opt.n_val_samples,
+       validation_data = HMDB51(opt.video_path, opt.annotation_path, opt.random, 'validation', opt.n_val_samples,
                                 spatial_transform, temporal_transform, target_transform,
                                 sample_duration=opt.sample_duration)
     return validation_data
