@@ -1,13 +1,34 @@
 import torch.nn as nn
 
+def get_fine_tuning_parameters(model, ft_begin_index):
+    if ft_begin_index == 0:
+        return model.parameters()
 
-class C3D(nn.Module):
+    ft_module_names = []
+    for i in range(ft_begin_index, 5):
+        ft_module_names.append('denseblock{}'.format(i))
+        ft_module_names.append('transition{}'.format(i))
+    ft_module_names.append('norm5')
+    ft_module_names.append('classifier')
+
+    parameters = []
+    for k, v in model.named_parameters():
+        for ft_module in ft_module_names:
+            if ft_module in k:
+                parameters.append({'params': v})
+                break
+        else:
+            parameters.append({'params': v, 'lr': 0.0})
+
+    return parameters
+
+class C3D_model(nn.Module):
     """
     The C3D network as described in [1].
     """
 
-    def __init__(self,n_classes=1000):
-        super(C3D, self).__init__()
+    def __init__(self,n_classes=400):
+        super(C3D_model, self).__init__()
 
         self.conv1 = nn.Conv3d(3, 64, kernel_size=(3, 3, 3), padding=(1, 1, 1))
         self.pool1 = nn.MaxPool3d(kernel_size=(1, 2, 2), stride=(1, 2, 2))
@@ -34,7 +55,7 @@ class C3D(nn.Module):
         self.dropout = nn.Dropout(p=0.5)
 
         self.relu = nn.ReLU()
-        self.softmax = nn.Softmax()
+#        self.softmax = nn.Softmax()
 
     def forward(self, x):
 
@@ -63,10 +84,12 @@ class C3D(nn.Module):
         h = self.dropout(h)
 
         logits = self.fc8(h)
-        probs = self.softmax(logits)
+        #probs = self.softmax(logits)
 
-        return probs
-
+        return logits
+def C3D(num_classes):
+    model = C3D_model(num_classes)
+    return model
 """
 References
 ----------
