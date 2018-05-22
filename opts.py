@@ -26,6 +26,8 @@ def parse_opts():
     parser.set_defaults(std_norm=False)
     parser.add_argument('--nesterov', action='store_true', help='Nesterov momentum')
     parser.set_defaults(nesterov=False)
+    parser.add_argument('--random', default=False, type=bool, help='If true, training will be done on random labels')
+
     parser.add_argument('--optimizer', default='sgd', type=str, help='Currently only support SGD')
     parser.add_argument('--lr_patience', default=10, type=int, help='Patience of LR scheduler. See documentation of ReduceLROnPlateau.')
     parser.add_argument('--batch_size', default=128, type=int, help='Batch Size')
