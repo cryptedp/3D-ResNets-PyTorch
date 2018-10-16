@@ -77,29 +77,25 @@ def get_video_names_and_annotations(data, subset):
     return video_names, annotations
 
 
-def make_dataset(root_path, annotation_path, subset,
+def make_dataset(root_path, annotation_path, random, subset,
                  n_samples_for_each_video, sample_duration):
-    
-    data = load_annotation_data('/home/sammer/sports1m_train.json')
+    data = load_annotation_data(annotation_path)
     video_names, annotations = get_video_names_and_annotations(data, subset)
+    class_to_idx = get_class_labels(data)
+    idx_to_class = {}
+    for name, label in class_to_idx.items():
+        idx_to_class[label] = name
 
-    # return random labels
-    
-    idx_to_class = randomize_labels(annotations)
     dataset = []
-    # n_frames_file_path = os.path.join(video_path,'n_frames')
-    # print(n_frames_file_path)
     for i in range(len(video_names)):
         if i % 1000 == 0:
             print('dataset loading [{}/{}]'.format(i, len(video_names)))
 
-        video_path = os.path.join('data/sammer/sports_1m/jpg/', video_names[i])
-        # print(video_path)
+        video_path = os.path.join(root_path, video_names[i])
         if not os.path.exists(video_path):
             continue
 
         n_frames_file_path = os.path.join(video_path, 'n_frames')
-        # print(n_frames_file_path)
         n_frames = int(load_value_file(n_frames_file_path))
         if n_frames <= 0:
             continue
@@ -110,10 +106,13 @@ def make_dataset(root_path, annotation_path, subset,
             'video': video_path,
             'segment': [begin_t, end_t],
             'n_frames': n_frames,
-            'video_id': video_names[i]
+            'video_id': video_names[i].split('/')[1]
         }
         if len(annotations) != 0:
-            sample['label'] = annotations[i]
+            if random:
+                sample['label'] = np.random.choice(487)
+            else:
+                sample['label'] = class_to_idx[annotations[i]['label']]
         else:
             sample['label'] = -1
 
@@ -127,26 +126,16 @@ def make_dataset(root_path, annotation_path, subset,
                 step = sample_duration
             for j in range(1, n_frames, step):
                 sample_j = copy.deepcopy(sample)
-                sample_j['frame_indices'] = list(range(j, min(n_frames + 1,
+                sample_j['frame_indices'] = list(range(j, min(n_frames + 1, 
                                                               j + sample_duration)))
                 dataset.append(sample_j)
 
-    # print(dataset)
     return dataset, idx_to_class
 
     # randomize labels
 
 
-def randomize_labels(class_names):
-    labels = np.array(class_names)
-    np.random.seed(12345)
-    mask = np.random.rand(len(labels)) <= 1
-    rnd_labels = np.random.choice(487, mask.sum())
-    labels[mask] = rnd_labels
-    # we need to explicitly cast the labels from npy.int64 to
-    # builtin int type, otherwise pytorch will fail...
-    labels = [int(x) for x in labels]
-    return labels
+
 
 
 class sports1m(data.Dataset):
