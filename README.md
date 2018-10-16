@@ -4,10 +4,13 @@ How the dataloaded expects the data:
 
 
 Assume following directory structure: 
+
+```
 /data/
     UCF-101/jpg
     results
     ucf101_01.json
+```
 
 To train a model type in this command into the command line:
 
