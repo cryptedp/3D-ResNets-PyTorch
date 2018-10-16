@@ -8,7 +8,7 @@ Assume following directory structure:
 ```
 /data/
     UCF-101/jpg
-    results
+    results/
     ucf101_01.json
 ```
 
